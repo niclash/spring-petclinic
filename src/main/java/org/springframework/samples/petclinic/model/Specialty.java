@@ -18,13 +18,6 @@ package org.springframework.samples.petclinic.model;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-/**
- * Models a {@link Vet Vet's} specialty (for example, dentistry).
- *
- * @author Juergen Hoeller
- */
-@Entity
-@Table(name = "specialties")
-public class Specialty extends NamedEntity {
+public interface Specialty extends NamedEntity {
 
 }
