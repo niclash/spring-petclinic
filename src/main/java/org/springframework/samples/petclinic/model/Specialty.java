@@ -15,9 +15,4 @@
  */
 package org.springframework.samples.petclinic.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-public interface Specialty extends NamedEntity {
-
-}
+public interface Specialty extends NamedEntity {}

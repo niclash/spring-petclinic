@@ -54,4 +54,52 @@ That was really easy. We end up with very tight state objects as a
 start. I suspect that there should be a little bit more behavior in there
 and we might make the state private later.
 
+Here are the resulting classes.
+
+    public interface NamedEntity
+    {
+        Property<String> name();
+    }
+
+    public interface Owner extends Person {
+        Property<String> address();
+        Property<String> city();
+        Property<String> telephone();
+        NamedAssociation<Pet> pets();
+    }
+
+    public interface Person {
+        Property<String> firstName();
+        Property<String>  lastName();
+    }
+
+    public interface Pet extends NamedEntity {
+        Property<LocalDate> birthDate();
+        Association<PetType> type();
+        Association<Owner> owner();
+        ManyAssociation<Visit> visits();
+    }
+
+    public interface PetType extends NamedEntity {}
+
+    public interface Specialty extends NamedEntity {}
+
+    public interface Vet extends Person {
+        ManyAssociation<Specialty> specialties();
+    }
+
+    public interface Vets {
+        ManyAssociation<Vet> vets();
+    }
+
+    public interface Visit {
+        Property<LocalDate> date();
+        Property<String> description();
+        Property<Pet> pet();
+    }
+
+The interesting bit is the ```@Digits``` annotation, which we should
+implement with Zest constraints. But let's look at that later.
+
+This concludes the model changes for now.
 

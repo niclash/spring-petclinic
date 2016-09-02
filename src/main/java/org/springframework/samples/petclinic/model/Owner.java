@@ -15,7 +15,6 @@
  */
 package org.springframework.samples.petclinic.model;
 
-import javax.validation.constraints.Digits;
 import org.apache.zest.api.association.NamedAssociation;
 import org.apache.zest.api.property.Property;
 
@@ -25,7 +24,6 @@ public interface Owner extends Person {
 
     Property<String> city();
 
-    @Digits(fraction = 0, integer = 10)
     Property<String> telephone();
 
     NamedAssociation<Pet> pets();
