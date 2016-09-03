@@ -268,3 +268,7 @@ Let's create a ```Data Sample Loader``` service that fill up the
 entity store with the same values as the SQL DDL does.
 
 ## Almost done test cases
+
+## Test cases all pass.
+The final test case now passes, after a small bug in the
+```SampleDataLoader```

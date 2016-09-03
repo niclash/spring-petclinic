@@ -135,7 +135,9 @@ public interface SampleDataLoader
             proto.birthDate().set( birthdate );
             proto.type().set( petType );
             proto.owner().set( owner );
-            return builder.newInstance();
+            Pet pet = builder.newInstance();
+            owner.pets().put( name, pet );
+            return pet;
         }
 
         private Visit createVisit( String uuid, Pet pet, LocalDate visitDate, String description )
