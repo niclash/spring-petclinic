@@ -67,7 +67,7 @@ public interface OwnerRepository
      * found)
      */
     @UnitOfWorkPropagation
-    Collection<Owner> findByLastName( String lastName )
+    Query<Owner> findByLastName( String lastName )
         throws DataAccessException;
 
     /**
@@ -80,7 +80,7 @@ public interface OwnerRepository
      * @throws org.springframework.dao.DataRetrievalFailureException if not found
      */
     @UnitOfWorkPropagation
-    Owner findById( int id )
+    Owner findById( String id )
         throws DataAccessException;
 
     class Mixin
@@ -94,21 +94,18 @@ public interface OwnerRepository
         private QueryBuilderFactory qbf;
 
         @Override
-        public Collection<Owner> findByLastName( String lastName )
+        public Query<Owner> findByLastName( String lastName )
             throws DataAccessException
         {
             UnitOfWork uow = uowf.currentUnitOfWork();
             QueryBuilder<Owner> builder = qbf.newQueryBuilder( Owner.class );
             Owner template = templateFor( Owner.class );
             builder.where( eq( template.lastName(), lastName ) );
-            Query<Owner> query = uow.newQuery( builder );
-            ArrayList<Owner> owners = new ArrayList<>();
-            query.iterator().forEachRemaining( owners::add );
-            return owners;
+            return uow.newQuery( builder );
         }
 
         @Override
-        public Owner findById( int id )
+        public Owner findById( String id )
             throws DataAccessException
         {
             return uowf.currentUnitOfWork().get( Owner.class, String.valueOf( id ) );

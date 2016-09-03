@@ -59,7 +59,7 @@ public interface PetRepository
      * @throws org.springframework.dao.DataRetrievalFailureException if not found
      */
     @UnitOfWorkPropagation
-    Pet findById( int id )
+    Pet findById( String id )
         throws DataAccessException;
 
     class Mixin
@@ -85,7 +85,7 @@ public interface PetRepository
         }
 
         @Override
-        public Pet findById( int id )
+        public Pet findById( String id )
             throws DataAccessException
         {
             UnitOfWork uow = uowf.currentUnitOfWork();

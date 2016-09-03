@@ -15,37 +15,44 @@
  */
 package org.springframework.samples.petclinic.service;
 
+import java.time.LocalDate;
 import java.util.Collection;
-
-import org.springframework.dao.DataAccessException;
+import org.apache.zest.api.mixin.Mixins;
+import org.apache.zest.api.unitofwork.concern.UnitOfWorkPropagation;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetType;
 import org.springframework.samples.petclinic.model.Vet;
-import org.springframework.samples.petclinic.model.Visit;
-
 
 /**
- * Mostly used as a facade so all controllers have a single point of entry
- *
- * @author Michael Isvy
+ * Mostly used as a facade so all controllers have a single point of entry, and that it is values returned, not
+ * entities.
  */
-public interface ClinicService {
+@Mixins(ClinicServiceMixin.class)
+public interface ClinicService
+{
 
-    Collection<PetType> findPetTypes() throws DataAccessException;
+    @UnitOfWorkPropagation
+    Collection<PetType> findPetTypes();
 
-    Owner findOwnerById(int id) throws DataAccessException;
+    @UnitOfWorkPropagation
+    Owner findOwnerById( String id );
 
-    Pet findPetById(int id) throws DataAccessException;
+    @UnitOfWorkPropagation
+    Pet findPetById( String id );
 
-    void savePet(Pet pet) throws DataAccessException;
+    @UnitOfWorkPropagation
+    void createPet( String name );
 
-    void saveVisit(Visit visit) throws DataAccessException;
+    @UnitOfWorkPropagation
+    void createVisit( String petId, LocalDate visitDate, String description );
 
-    Collection<Vet> findVets() throws DataAccessException;
+    @UnitOfWorkPropagation
+    Collection<Vet> findVets();
 
-    void saveOwner(Owner owner) throws DataAccessException;
+    @UnitOfWorkPropagation
+    void createOwner( String firstName, String lastName );
 
-    Collection<Owner> findOwnerByLastName(String lastName) throws DataAccessException;
-
+    @UnitOfWorkPropagation
+    Collection<Owner> findOwnerByLastName( String lastName );
 }

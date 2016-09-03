@@ -17,6 +17,7 @@ package org.springframework.samples.petclinic.repository;
 
 import java.util.Collection;
 
+import org.apache.zest.api.association.ManyAssociation;
 import org.apache.zest.api.injection.scope.Structure;
 import org.apache.zest.api.mixin.Mixins;
 import org.apache.zest.api.unitofwork.UnitOfWork;
@@ -37,7 +38,7 @@ public interface VetRepository {
      *
      * @return a <code>Collection</code> of <code>Vet</code>s
      */
-    Collection<Vet> findAll() throws DataAccessException;
+    ManyAssociation<Vet> findAll() throws DataAccessException;
 
     class Mixin
         implements VetRepository
@@ -46,12 +47,12 @@ public interface VetRepository {
         private UnitOfWorkFactory uowf;
 
         @Override
-        public Collection<Vet> findAll()
+        public ManyAssociation<Vet> findAll()
             throws DataAccessException
         {
             UnitOfWork uow = uowf.currentUnitOfWork();
             Vets vets = uow.get( Vets.class, "<all vets>" );
-            return vets.vets().toList();
+            return vets.vets();
         }
     }
 }

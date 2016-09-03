@@ -139,3 +139,9 @@ This is completely unnecessary. The visits of a given Pet is found
 inside the Pet. And the factory of the ```Visit``` could also be in the
 Pet class, where it kind of belong.
 
+## Service layer
+The service layer is pathetic. A bunch of methods in the wrong place.
+But instead of fixing the design issue, we should first convert it to
+Zest code.
+
+Implementing a new ClinicServiceMixin took about 10 minutes.
