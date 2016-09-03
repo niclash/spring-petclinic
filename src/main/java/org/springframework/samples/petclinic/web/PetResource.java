@@ -33,11 +33,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.SessionStatus;
 
-/**
- * @author Juergen Hoeller
- * @author Ken Krebs
- * @author Arjen Poutsma
- */
 @RestController
 public class PetResource {
 
@@ -60,10 +55,9 @@ public class PetResource {
     }
 
     @RequestMapping(value = "/owners/{ownerId}/pets/new", method = RequestMethod.GET)
-    public String initCreationForm(@PathVariable("ownerId") int ownerId, Map<String, Object> model) {
+    public String initCreationForm(@PathVariable("ownerId") String ownerId, Map<String, Object> model) {
         Owner owner = this.clinicService.findOwnerById(ownerId);
-        Pet pet = new Pet();
-        owner.addPet(pet);
+        Pet pet = clinicService.createPet( owner, "" );
         model.put("pet", pet);
         return "pets/createOrUpdatePetForm";
     }
@@ -74,14 +68,14 @@ public class PetResource {
         if (result.hasErrors()) {
             return "pets/createOrUpdatePetForm";
         } else {
-            this.clinicService.savePet(pet);
+            this.clinicService.updatePet(pet);
             status.setComplete();
             return "redirect:/owner/{ownerId}";
         }
     }
 
     @RequestMapping(value = "/owner/*/pet/{petId}", method = RequestMethod.GET)
-    public Pet findPet(@PathVariable("petId") int petId) {
+    public Pet findPet(@PathVariable("petId") String petId) {
         Pet pet = this.clinicService.findPetById(petId);
         return pet;
     }
@@ -93,7 +87,7 @@ public class PetResource {
         if (result.hasErrors()) {
             return "pets/createOrUpdatePetForm";
         } else {
-            this.clinicService.savePet(pet);
+            this.clinicService.updatePet(pet);
             status.setComplete();
             return "redirect:/owners/{ownerId}";
         }

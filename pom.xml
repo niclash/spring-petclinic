@@ -95,6 +95,11 @@
       <artifactId>org.apache.zest.library.jmx</artifactId>
       <version>${zest.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.zest.library</groupId>
+      <artifactId>org.apache.zest.library.constraints</artifactId>
+      <version>${zest.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.jadira.usertype</groupId>

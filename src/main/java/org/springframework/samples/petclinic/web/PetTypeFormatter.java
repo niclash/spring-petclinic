@@ -33,9 +33,6 @@ import org.springframework.samples.petclinic.service.ClinicService;
  * <p/>
  * Also see how the bean 'conversionService' has been declared inside /WEB-INF/mvc-core-config.xml
  *
- * @author Mark Fisher
- * @author Juergen Hoeller
- * @author Michael Isvy
  */
 public class PetTypeFormatter implements Formatter<PetType> {
 
@@ -49,14 +46,14 @@ public class PetTypeFormatter implements Formatter<PetType> {
 
     @Override
     public String print(PetType petType, Locale locale) {
-        return petType.getName();
+        return petType.name().get();
     }
 
     @Override
     public PetType parse(String text, Locale locale) throws ParseException {
         Collection<PetType> findPetTypes = this.clinicService.findPetTypes();
         for (PetType type : findPetTypes) {
-            if (type.getName().equals(text)) {
+            if (type.name().get().equals(text)) {
                 return type;
             }
         }

@@ -16,13 +16,26 @@
 package org.springframework.samples.petclinic.model;
 
 import org.apache.zest.api.entity.Identity;
+import org.apache.zest.api.mixin.Mixins;
 import org.apache.zest.api.property.Property;
 
+@Mixins( Person.Mixin.class )
 public interface Person extends Identity
 {
 
     Property<String> firstName();
 
-    Property<String>  lastName();
+    Property<String> lastName();
 
+    String fullName();
+
+    abstract class Mixin
+        implements Person
+    {
+        @Override
+        public String fullName()
+        {
+            return firstName().get() + " " + lastName().get();
+        }
+    }
 }

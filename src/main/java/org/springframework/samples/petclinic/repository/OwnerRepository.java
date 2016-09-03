@@ -30,8 +30,6 @@
  */
 package org.springframework.samples.petclinic.repository;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import org.apache.zest.api.concern.Concerns;
 import org.apache.zest.api.injection.scope.Structure;
 import org.apache.zest.api.mixin.Mixins;
@@ -100,7 +98,10 @@ public interface OwnerRepository
             UnitOfWork uow = uowf.currentUnitOfWork();
             QueryBuilder<Owner> builder = qbf.newQueryBuilder( Owner.class );
             Owner template = templateFor( Owner.class );
-            builder.where( eq( template.lastName(), lastName ) );
+            if( lastName.length() > 0 )
+            {
+                builder.where( eq( template.lastName(), lastName ) );
+            }
             return uow.newQuery( builder );
         }
 

@@ -64,16 +64,13 @@ public class VisitController {
      * @return Pet
      */
     @ModelAttribute("visit")
-    public Visit loadPetWithVisit(@PathVariable("petId") int petId) {
-        Pet pet = this.clinicService.findPetById(petId);
-        Visit visit = new Visit();
-        pet.addVisit(visit);  
-        return visit;
+    public Visit loadPetWithVisit(@PathVariable("petId") String petId) {
+        return clinicService.visitVet( petId, null, "" );
     }
 
 	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is called
     @RequestMapping(value = "/owners/*/pets/{petId}/visits/new", method = RequestMethod.GET)
-    public String initNewVisitForm(@PathVariable("petId") int petId, Map<String, Object> model) {
+    public String initNewVisitForm(@PathVariable("petId") String petId, Map<String, Object> model) {
         return "pets/createOrUpdateVisitForm";
     }
 
@@ -83,14 +80,14 @@ public class VisitController {
         if (result.hasErrors()) {
             return "pets/createOrUpdateVisitForm";
         } else {
-            this.clinicService.saveVisit(visit);
+            this.clinicService.updateVisit(visit);
             return "redirect:/owners/{ownerId}";
         }
     }
 
     @RequestMapping(value = "/owners/*/pets/{petId}/visits", method = RequestMethod.GET)
-    public String showVisits(@PathVariable int petId, Map<String, Object> model) {
-        model.put("visits", this.clinicService.findPetById(petId).getVisits());
+    public String showVisits(@PathVariable String petId, Map<String, Object> model) {
+        model.put("visits", this.clinicService.findVisitsByPet(petId));
         return "visitList";
     }
 

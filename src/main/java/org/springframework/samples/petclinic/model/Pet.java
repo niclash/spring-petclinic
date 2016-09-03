@@ -21,6 +21,7 @@ import org.apache.zest.api.association.ManyAssociation;
 import org.apache.zest.api.common.Optional;
 import org.apache.zest.api.common.UseDefaults;
 import org.apache.zest.api.concern.Concerns;
+import org.apache.zest.api.constraint.Constraints;
 import org.apache.zest.api.entity.EntityBuilder;
 import org.apache.zest.api.injection.scope.Structure;
 import org.apache.zest.api.mixin.Mixins;
@@ -35,7 +36,7 @@ import org.apache.zest.api.unitofwork.concern.UnitOfWorkPropagation;
 public interface Pet extends NamedEntity {
 
     @UnitOfWorkPropagation
-    void visitVet( LocalDate visitDate, String description );
+    Visit visitVet( LocalDate visitDate, String description );
 
     @Optional
     Property<LocalDate> birthDate();
@@ -56,7 +57,7 @@ public interface Pet extends NamedEntity {
         private UnitOfWorkFactory uowf;
 
         @Override
-        public void visitVet( LocalDate visitDate, String description )
+        public Visit visitVet( LocalDate visitDate, String description )
         {
             UnitOfWork uow = uowf.currentUnitOfWork();
             EntityBuilder<Visit> builder = uow.newEntityBuilder( Visit.class );
@@ -65,6 +66,7 @@ public interface Pet extends NamedEntity {
             prototype.description().set( description );
             Visit visit = builder.newInstance();
             visits().add( visit );
+            return visit;
         }
     }
 }

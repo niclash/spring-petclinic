@@ -15,12 +15,15 @@
  */
 package org.springframework.samples.petclinic.model;
 
+import org.apache.zest.api.association.ManyAssociation;
 import org.apache.zest.api.association.NamedAssociation;
 import org.apache.zest.api.common.Optional;
 import org.apache.zest.api.common.UseDefaults;
+import org.apache.zest.api.mixin.Mixins;
 import org.apache.zest.api.property.Property;
 
-public interface Owner extends Person {
+public interface Owner extends Person
+{
 
     @Optional
     Property<String> address();

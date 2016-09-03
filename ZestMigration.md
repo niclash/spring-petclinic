@@ -164,3 +164,54 @@ The JMX library is at the moment "automatic" in that it reveals what
 it can over JMX, but has no official extension points. So we leave it
 as this for now. At a later stage, we should probably integrate the
 JMX library with the Metrics extension system.
+
+## Web package
+This is where the rubber hits the road, and the integration complexity
+kicks in, since we don't want to abandon Spring MVC at this point.
+
+### CrashController
+No changes needed for now.
+
+### OwnerResource
+Ok, so this class handles shuffling the fields from values to entities
+and vice versa (well, the other way is really simple). The serialization
+of this is hidden somewhere inside Spring, so what should we do about it?
+
+Let's worry about that later. First we remove the mapping and instead
+introduce a method in ```ClinicService``` to update an ```Owner```. Since
+Zest will do the update automatically when converting from
+```ValueComposite``` to ```EntityComposite``` we don't need to do the
+shuffling of fields. Apparently Spring recommends ```MapStruct``` to
+achieve the same.
+
+Small changes here and there. I decided to use ```String``` for all
+identities instead of ```int```.
+
+### PetResource
+Not much exciting stuff here. Change a lot of small details, adding
+methods to ClinicService to update the Pet, and continue to leverage
+the ```toEntity``` method in ```UnitOfWork``` that handles all the
+shuffling bits.
+
+### PetTypeFormatter
+Here we only seem to need to change two ```getName()``` to
+```name().get()``` and nothing else. We leave it that for now.
+
+### PetValidator
+It checks constraints on Pet, which are built into Zest runtime. I think
+we can drop that for now, and add Zest Constraint for the only additional
+feature, which is make sure that one Owner only has one Pet with the
+same name. This is an invariant check, and invariants are not yet
+implemented properly in Zest. So we add this check into the
+```ClinicService``` for creating the ```Pet```. Deleted the
+```PetValidator```.
+
+### VetResource
+Seems like no changes are needed here at the moment.
+
+### VisitController
+Various changes needed. Adding ```updateVisit``` in ```ClinicService```
+and a few other smaller things.
+
+## Done phase one
+That concludes the first round of changes in the application code.
