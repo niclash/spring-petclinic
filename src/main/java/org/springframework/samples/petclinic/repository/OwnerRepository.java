@@ -40,7 +40,6 @@ import org.apache.zest.api.unitofwork.UnitOfWork;
 import org.apache.zest.api.unitofwork.UnitOfWorkFactory;
 import org.apache.zest.api.unitofwork.concern.UnitOfWorkConcern;
 import org.apache.zest.api.unitofwork.concern.UnitOfWorkPropagation;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Owner;
 
 import static org.apache.zest.api.query.QueryExpressions.eq;
@@ -65,8 +64,7 @@ public interface OwnerRepository
      * found)
      */
     @UnitOfWorkPropagation
-    Query<Owner> findByLastName( String lastName )
-        throws DataAccessException;
+    Query<Owner> findByLastName( String lastName );
 
     /**
      * Retrieve an <code>Owner</code> from the data store by id.
@@ -78,8 +76,7 @@ public interface OwnerRepository
      * @throws org.springframework.dao.DataRetrievalFailureException if not found
      */
     @UnitOfWorkPropagation
-    Owner findById( String id )
-        throws DataAccessException;
+    Owner findById( String id );
 
     class Mixin
         implements OwnerRepository
@@ -93,7 +90,6 @@ public interface OwnerRepository
 
         @Override
         public Query<Owner> findByLastName( String lastName )
-            throws DataAccessException
         {
             UnitOfWork uow = uowf.currentUnitOfWork();
             QueryBuilder<Owner> builder = qbf.newQueryBuilder( Owner.class );
@@ -107,7 +103,6 @@ public interface OwnerRepository
 
         @Override
         public Owner findById( String id )
-            throws DataAccessException
         {
             return uowf.currentUnitOfWork().get( Owner.class, String.valueOf( id ) );
         }

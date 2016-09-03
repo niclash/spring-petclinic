@@ -91,8 +91,18 @@
       <version>${zest.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.zest.core</groupId>
+      <artifactId>org.apache.zest.core.testsupport</artifactId>
+      <version>${zest.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.zest.library</groupId>
       <artifactId>org.apache.zest.library.jmx</artifactId>
+      <version>${zest.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.zest.extension</groupId>
+      <artifactId>org.apache.zest.extension.indexing-rdf</artifactId>
       <version>${zest.version}</version>
     </dependency>
     <dependency>

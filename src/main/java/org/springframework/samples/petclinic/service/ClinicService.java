@@ -18,7 +18,9 @@ package org.springframework.samples.petclinic.service;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import org.apache.zest.api.concern.Concerns;
 import org.apache.zest.api.mixin.Mixins;
+import org.apache.zest.api.unitofwork.concern.UnitOfWorkConcern;
 import org.apache.zest.api.unitofwork.concern.UnitOfWorkPropagation;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
@@ -31,6 +33,7 @@ import org.springframework.samples.petclinic.model.Visit;
  * entities.
  */
 @Mixins(ClinicServiceMixin.class)
+@Concerns( UnitOfWorkConcern.class)
 public interface ClinicService
 {
 
@@ -62,7 +65,7 @@ public interface ClinicService
     Collection<Vet> findVets();
 
     @UnitOfWorkPropagation
-    void createOwner( String firstName, String lastName );
+    Owner createOwner( String firstName, String lastName );
 
     @UnitOfWorkPropagation
     Collection<Owner> findOwnerByLastName( String lastName );

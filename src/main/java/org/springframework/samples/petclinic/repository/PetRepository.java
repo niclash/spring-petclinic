@@ -27,7 +27,6 @@ import org.apache.zest.api.unitofwork.UnitOfWork;
 import org.apache.zest.api.unitofwork.UnitOfWorkFactory;
 import org.apache.zest.api.unitofwork.concern.UnitOfWorkConcern;
 import org.apache.zest.api.unitofwork.concern.UnitOfWorkPropagation;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetType;
 
@@ -46,8 +45,7 @@ public interface PetRepository
      * @return a <code>Collection</code> of <code>PetType</code>s
      */
     @UnitOfWorkPropagation
-    List<PetType> findPetTypes()
-        throws DataAccessException;
+    List<PetType> findPetTypes();
 
     /**
      * Retrieve a <code>Pet</code> from the data store by id.
@@ -59,8 +57,7 @@ public interface PetRepository
      * @throws org.springframework.dao.DataRetrievalFailureException if not found
      */
     @UnitOfWorkPropagation
-    Pet findById( String id )
-        throws DataAccessException;
+    Pet findById( String id );
 
     class Mixin
         implements PetRepository
@@ -74,7 +71,6 @@ public interface PetRepository
 
         @Override
         public List<PetType> findPetTypes()
-            throws DataAccessException
         {
             UnitOfWork uow = uowf.currentUnitOfWork();
             QueryBuilder<PetType> builder = qbf.newQueryBuilder( PetType.class );
@@ -86,7 +82,6 @@ public interface PetRepository
 
         @Override
         public Pet findById( String id )
-            throws DataAccessException
         {
             UnitOfWork uow = uowf.currentUnitOfWork();
             return  uow.get( Pet.class, String.valueOf( id ) );

@@ -213,5 +213,38 @@ Seems like no changes are needed here at the moment.
 Various changes needed. Adding ```updateVisit``` in ```ClinicService```
 and a few other smaller things.
 
-## Done phase one
+# Done phase one
 That concludes the first round of changes in the application code.
+
+# Tests
+We now need to proceed and fix all the tests. Not simply delete them,
+but make them actually work. There are 8 test classes in total. Let's
+fix them all in one go.
+
+## ValidatorTest
+Not too much to fix here. Easy-peasy...
+
+## AbstractClinicServiceTest
+This is actally the tests for the 3 subclasses testing each of the
+implementations in the original code. We will delete those
+implementations, and fix all (and it is a lot) of the save() methods
+into update() methods, all the getters and setters to Zest Property
+access.
+
+We will also rename this class as it is no longer abstract. Our
+underlying implementations are pluggable without additional coding,
+and doesn't require tests.
+
+Right now it is unclear how the test data is populated. I will probably
+find some stinking SQL DDL for that. We ignore that for the time being.
+
+We also need to set up the bootstrap of the test, and that reveals
+we need an Indexer. Let's use the RdfIndexer (in-memory).
+
+So far I have spent 8 hours, on and off, doing this migration. Not too
+bad, and let's get this done today.
+
+# First step in testing completed
+All tests compile, and the Zest assembly in ClinicServiceTests succeeds.
+
+

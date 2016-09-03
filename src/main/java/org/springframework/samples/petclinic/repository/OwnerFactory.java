@@ -3,6 +3,7 @@ package org.springframework.samples.petclinic.repository;
 import org.apache.zest.api.concern.Concerns;
 import org.apache.zest.api.entity.EntityBuilder;
 import org.apache.zest.api.injection.scope.Structure;
+import org.apache.zest.api.mixin.Mixins;
 import org.apache.zest.api.unitofwork.UnitOfWork;
 import org.apache.zest.api.unitofwork.UnitOfWorkFactory;
 import org.apache.zest.api.unitofwork.concern.UnitOfWorkConcern;
@@ -10,6 +11,7 @@ import org.apache.zest.api.unitofwork.concern.UnitOfWorkPropagation;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Person;
 
+@Mixins(OwnerFactory.Mixin.class)
 @Concerns( UnitOfWorkConcern.class )
 public interface OwnerFactory
 {

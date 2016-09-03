@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.zest.api.association.ManyAssociation;
 import org.apache.zest.api.association.NamedAssociation;
 import org.apache.zest.api.injection.scope.Service;
 import org.apache.zest.api.injection.scope.Structure;
@@ -125,13 +124,17 @@ public class ClinicServiceMixin
     public Collection<Vet> findVets()
     {
         UnitOfWork uow = uowf.currentUnitOfWork();
-        return uow.toValueList( vetRepository.findAll() );
+        return vetRepository.findAll()
+            .stream()
+            .map( entity -> uow.toValue( Vet.class, entity ))
+            .collect( Collectors.toList() );
     }
 
     @Override
-    public void createOwner( String firstName, String lastName )
+    public Owner createOwner( String firstName, String lastName )
     {
-        ownerFactory.create( firstName, lastName );
+        UnitOfWork uow = uowf.currentUnitOfWork();
+        return uow.toValue( Owner.class, ownerFactory.create( firstName, lastName ) );
     }
 
     @Override
