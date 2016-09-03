@@ -121,6 +121,14 @@ public class ClinicServiceMixin
     }
 
     @Override
+    public Owner findOwnerByPet( Pet pet7 )
+    {
+        UnitOfWork uow = uowf.currentUnitOfWork();
+        Owner owner = uow.toEntity( Pet.class, pet7 ).owner().get();
+        return uow.toValue( Owner.class, owner );
+    }
+
+    @Override
     public Collection<Vet> findVets()
     {
         UnitOfWork uow = uowf.currentUnitOfWork();
@@ -140,9 +148,10 @@ public class ClinicServiceMixin
     @Override
     public Collection<Owner> findOwnerByLastName( String lastName )
     {
+        UnitOfWork uow = uowf.currentUnitOfWork();
         Query<Owner> byLastName = ownerRepository.findByLastName( lastName );
         ArrayList<Owner> owners = new ArrayList<>();
-        byLastName.iterator().forEachRemaining( owners::add );
+        byLastName.iterator().forEachRemaining( ( e ) -> owners.add( uow.toValue( Owner.class, e ) ) );
         return owners;
     }
 }

@@ -96,7 +96,7 @@ public interface OwnerRepository
             Owner template = templateFor( Owner.class );
             if( lastName.length() > 0 )
             {
-                builder.where( eq( template.lastName(), lastName ) );
+                builder = builder.where( eq( template.lastName(), lastName ) );
             }
             return uow.newQuery( builder );
         }

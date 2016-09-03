@@ -17,11 +17,12 @@ package org.springframework.samples.petclinic.service;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import org.apache.zest.api.injection.scope.Service;
 import org.apache.zest.api.injection.scope.Structure;
 import org.apache.zest.api.unitofwork.UnitOfWork;
 import org.apache.zest.api.unitofwork.UnitOfWorkFactory;
-import org.apache.zest.api.value.ValueSerialization;
+import org.apache.zest.api.value.ValueBuilder;
 import org.apache.zest.bootstrap.AssemblyException;
 import org.apache.zest.bootstrap.ModuleAssembly;
 import org.apache.zest.entitystore.memory.MemoryEntityStoreService;
@@ -29,8 +30,10 @@ import org.apache.zest.index.rdf.assembly.RdfMemoryStoreAssembler;
 import org.apache.zest.spi.uuid.UuidIdentityGeneratorService;
 import org.apache.zest.test.AbstractZestTest;
 import org.apache.zest.valueserialization.orgjson.OrgJsonValueSerializationService;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.dataloader.SampleDataLoader;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Person;
 import org.springframework.samples.petclinic.model.Pet;
@@ -49,6 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.apache.zest.api.value.ValueSerialization.Formats.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
 /**
  * <p> Base class for {@link ClinicService} integration tests. </p> <p> Subclasses should specify Spring context
@@ -85,7 +89,7 @@ public class ClinicServiceTests extends AbstractZestTest
     @Test
     public void shouldFindSingleOwnerWithPet()
     {
-        Owner owner = this.clinicService.findOwnerById( "1" );
+        Owner owner = this.clinicService.findOwnerById( "o1" );
         assertThat( owner.lastName().get() ).startsWith( "Franklin" );
         assertThat( owner.pets().count() ).isEqualTo( 1 );
     }
@@ -94,7 +98,8 @@ public class ClinicServiceTests extends AbstractZestTest
     public void shouldReturnAllOwnersInCaseLastNameIsEmpty()
     {
         Collection<Owner> owners = this.clinicService.findOwnerByLastName( "" );
-        assertThat( owners ).extracting( "lastName" ).contains( "Davis", "Franklin" );
+        Iterable<String> names = owners.stream().map( owner -> owner.lastName().get() ).collect( Collectors.toList() );
+        MatcherAssert.assertThat( names, containsInAnyOrder( "Franklin", "Davis", "Davis", "Rodriquez", "McTavish", "Coleman", "Black", "Escobito", "Schroeder", "Estaban" ) );
     }
 
     @Test
@@ -104,10 +109,14 @@ public class ClinicServiceTests extends AbstractZestTest
         Collection<Owner> owners = this.clinicService.findOwnerByLastName( "Schultz" );
         int found = owners.size();
         Owner owner = clinicService.createOwner( "Sam", "Schultz" );
-        owner.address().set( "4, Evans Street" );
-        owner.city().set( "Wollongong" );
-        owner.telephone().set( "4444444444" );
-        this.clinicService.updateOwner( owner );
+
+        // In Zest, all Values are immutable, so we need to build a new Value.
+        ValueBuilder<Owner> builder = valueBuilderFactory.newValueBuilderWithPrototype( owner );
+        Owner proto = builder.prototype();
+        proto.address().set( "4, Evans Street" );
+        proto.city().set( "Wollongong" );
+        proto.telephone().set( "4444444444" );
+        this.clinicService.updateOwner( builder.newInstance() );
         assertThat( owner.identity().get() ).isNotEqualTo( "0" );
 
         owners = this.clinicService.findOwnerByLastName( "Schultz" );
@@ -118,35 +127,44 @@ public class ClinicServiceTests extends AbstractZestTest
     @Transactional
     public void shouldUpdateOwner()
     {
-        Owner owner = this.clinicService.findOwnerById( "1" );
+        Owner owner = this.clinicService.findOwnerById( "o1" );
         String oldLastName = owner.lastName().get();
         String newLastName = oldLastName + "X";
 
-        owner.lastName().set( newLastName );
-        this.clinicService.updateOwner( owner );
+        // In Zest, all Values are immutable, so we need to build a new Value.
+        ValueBuilder<Owner> builder = valueBuilderFactory.newValueBuilderWithPrototype( owner );
+        Owner proto = builder.prototype();
+        proto.lastName().set( newLastName );
+        this.clinicService.updateOwner( builder.newInstance() );
 
         // retrieving new name from database
-        owner = this.clinicService.findOwnerById( "1" );
+        owner = this.clinicService.findOwnerById( "o1" );
         assertThat( owner.lastName().get() ).isEqualTo( newLastName );
     }
 
     @Test
     public void shouldFindPetWithCorrectId()
     {
-        Pet pet7 = this.clinicService.findPetById( "7" );
+        Pet pet7 = this.clinicService.findPetById( "p7" );
         assertThat( pet7.name().get() ).startsWith( "Samantha" );
-        assertThat( pet7.owner().get().firstName().get() ).isEqualTo( "Jean" );
+        Owner owner = clinicService.findOwnerByPet( pet7 );
+        assertThat( owner.firstName().get() ).isEqualTo( "Jean" );
     }
 
     @Test
     public void shouldFindAllPetTypes()
     {
-        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        Collection<PetType> petTypes = clinicService.findPetTypes();
+        for( PetType type : petTypes )
         {
-            PetType petType1 = uow.get( PetType.class, "1" );
-            assertThat( petType1.name().get() ).isEqualTo( "cat" );
-            PetType petType4 = uow.get( PetType.class, "4" );
-            assertThat( petType4.name().get() ).isEqualTo( "snake" );
+            if( type.identity().get().equals( "t1" ) )
+            {
+                assertThat( type.name().get() ).isEqualTo( "cat" );
+            }
+            if( type.identity().get().equals( "t4" ) )
+            {
+                assertThat( type.name().get() ).isEqualTo( "snake" );
+            }
         }
     }
 
@@ -154,25 +172,24 @@ public class ClinicServiceTests extends AbstractZestTest
     @Transactional
     public void shouldInsertPetIntoDatabaseAndGenerateId()
     {
-        Owner owner6 = this.clinicService.findOwnerById( "6" );
+        Owner owner6 = clinicService.findOwnerById( "o6" );
         int found = owner6.pets().count();
-        try (UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
-        {
-            Pet pet = clinicService.createPet( owner6, "bowser" );
-            pet.birthDate().set( LocalDate.now() );
-            pet.type().set( uow.get( PetType.class, "2" ) );
+        Collection<PetType> petTypes = clinicService.findPetTypes();
+        PetType newPetType = petTypes.iterator().next();
 
-            assertThat( owner6.pets().count() ).isEqualTo( found + 1 );
-        }
+        Pet pet = clinicService.createPet( owner6, "bowser" );
+        // In Zest, all Values are immutable, so we need to build a new Value.
+        ValueBuilder<Pet> builder = valueBuilderFactory.newValueBuilderWithPrototype( pet );
+        Pet proto = builder.prototype();
+        proto.birthDate().set( LocalDate.now() );
+        proto.type().set( newPetType );
+        clinicService.updatePet( builder.newInstance() );
 
-        owner6 = this.clinicService.findOwnerById( "6" );
+        owner6 = clinicService.findOwnerById( "o6" );
         assertThat( owner6.pets().count() ).isEqualTo( found + 1 );
-        // checks that id has been generated
-        for( String name : owner6.pets())
-        {
-            Pet pet = owner6.pets().get(name);
-            assertThat( pet.identity().get() ).isNotNull();
-        }
+
+        owner6 = this.clinicService.findOwnerById( "o6" );
+        assertThat( owner6.pets().count() ).isEqualTo( found + 1 );
     }
 
     @Test
@@ -180,14 +197,17 @@ public class ClinicServiceTests extends AbstractZestTest
     public void shouldUpdatePetName()
         throws Exception
     {
-        Pet pet7 = this.clinicService.findPetById( "7" );
+        Pet pet7 = this.clinicService.findPetById( "p7" );
         String oldName = pet7.name().get();
-
         String newName = oldName + "X";
-        pet7.name().set( newName );
-        this.clinicService.updatePet( pet7 );
 
-        pet7 = this.clinicService.findPetById( "7" );
+        // In Zest, all Values are immutable, so we need to build a new Value.
+        ValueBuilder<Pet> builder = valueBuilderFactory.newValueBuilderWithPrototype( pet7 );
+        Pet proto = builder.prototype();
+        proto.name().set( newName );
+        this.clinicService.updatePet( builder.newInstance() );
+
+        pet7 = this.clinicService.findPetById( "p7" );
         assertThat( pet7.name().get() ).isEqualTo( newName );
     }
 
@@ -196,11 +216,11 @@ public class ClinicServiceTests extends AbstractZestTest
     {
         try (UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Vet vet = uow.get( Vet.class, "3" );
+            Vet vet = uow.get( Vet.class, "v3" );
             assertThat( vet.lastName().get() ).isEqualTo( "Douglas" );
             assertThat( vet.specialties().count() ).isEqualTo( 2 );
-            assertThat( vet.specialties().get( 0 ).name().get() ).isEqualTo( "dentistry" );
-            assertThat( vet.specialties().get( 1 ).name().get() ).isEqualTo( "surgery" );
+            assertThat( vet.specialties().get( 0 ).name().get() ).isEqualTo( "surgery" );
+            assertThat( vet.specialties().get( 1 ).name().get() ).isEqualTo( "dentistry" );
         }
     }
 
@@ -208,13 +228,21 @@ public class ClinicServiceTests extends AbstractZestTest
     @Transactional
     public void shouldAddNewVisitForPet()
     {
-        Pet pet7 = this.clinicService.findPetById( "7" );
+        Pet pet7 = this.clinicService.findPetById( "p7" );
         int found = pet7.visits().count();
-        Visit visit = clinicService.visitVet( "7", LocalDate.now(), "test" );
+        Visit visit = clinicService.visitVet( "p7", LocalDate.now(), "test" );
 
-        pet7 = this.clinicService.findPetById( "7" );
+        pet7 = this.clinicService.findPetById( "p7" );
         assertThat( pet7.visits().count() ).isEqualTo( found + 1 );
         assertThat( visit.identity().get() ).isNotNull();
+    }
+
+    @Override
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
+        serviceFinder.findService( SampleDataLoader.class ).get().loadData();
     }
 
     @Override
@@ -223,6 +251,7 @@ public class ClinicServiceTests extends AbstractZestTest
     {
         module.values( Person.class, Owner.class, Pet.class, PetType.class, Specialty.class, Vet.class, Vets.class, Visit.class );
         module.entities( Person.class, Owner.class, Pet.class, PetType.class, Specialty.class, Vet.class, Vets.class, Visit.class );
+        module.services( SampleDataLoader.class ).instantiateOnStartup();
         module.services( PetFactory.class ).instantiateOnStartup();
         module.services( PetRepository.class ).instantiateOnStartup();
         module.services( OwnerFactory.class ).instantiateOnStartup();

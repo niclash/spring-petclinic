@@ -247,4 +247,24 @@ bad, and let's get this done today.
 # First step in testing completed
 All tests compile, and the Zest assembly in ClinicServiceTests succeeds.
 
+# Tackle Spring clutter and junk
 
+## EhCache
+Remove all EhCache stuff. We will run application in-memory story
+and caching is not needed.
+
+## Hibernate
+Remove all Hibernate junk. Horrible stuff.
+
+## Database and SQL stuff
+Remove all XML and propeties files related to data sources, JPA and
+so on.
+
+## Initialization of database
+Hey! I found the SQL DDL that populates the initial data set. Talk
+about impedance mismatch.
+
+Let's create a ```Data Sample Loader``` service that fill up the
+entity store with the same values as the SQL DDL does.
+
+## Almost done test cases

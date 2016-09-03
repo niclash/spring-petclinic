@@ -70,5 +70,9 @@ public interface ClinicService
     @UnitOfWorkPropagation
     Collection<Owner> findOwnerByLastName( String lastName );
 
+    @UnitOfWorkPropagation
     void updateVisit( Visit visit );
+
+    @UnitOfWorkPropagation
+    Owner findOwnerByPet( Pet pet7 );
 }
