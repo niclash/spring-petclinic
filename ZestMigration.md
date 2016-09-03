@@ -145,3 +145,22 @@ But instead of fixing the design issue, we should first convert it to
 Zest code.
 
 Implementing a new ClinicServiceMixin took about 10 minutes.
+
+## Util package
+There is an ```EntityUtils``` class which has no purpose other than
+being called from a test. And its method is basically the ```get```
+method in ```UnitOfWork```, so we don't need it for now. Let's remove
+that.
+
+The other class in the package is ```CallMonitoringAspect``` which
+tries to link the application to JMX. We have a JMX library that does
+this more directly. Let's add that instead, and remove this class. When
+deleting this class, IDEA complains that it is referenced from a Spring
+XML file called ```tools-config.xml``` containing this and some
+persistence caching. Let's delete that file as well. That XML file is
+referenced from ```web.xml``` and in ```AbstractWebResourceTest```.
+
+The JMX library is at the moment "automatic" in that it reveals what
+it can over JMX, but has no official extension points. So we leave it
+as this for now. At a later stage, we should probably integrate the
+JMX library with the Metrics extension system.

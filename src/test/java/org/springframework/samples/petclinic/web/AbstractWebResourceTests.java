@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:spring/business-config.xml", "classpath:spring/tools-config.xml", "classpath:spring/mvc-core-config.xml"})
+@ContextConfiguration({"classpath:spring/business-config.xml", "classpath:spring/mvc-core-config.xml"})
 @WebAppConfiguration
 @ActiveProfiles("spring-data-jpa")
 
