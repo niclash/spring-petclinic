@@ -15,4 +15,8 @@
  */
 package org.springframework.samples.petclinic.model;
 
-public interface PetType extends NamedEntity {}
+import org.apache.zest.api.association.ManyAssociation;
+
+public interface PetType extends NamedEntity {
+
+}

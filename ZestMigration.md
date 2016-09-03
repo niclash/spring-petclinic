@@ -103,3 +103,39 @@ implement with Zest constraints. But let's look at that later.
 
 This concludes the model changes for now.
 
+## Look at Repository package
+There are 4 repositories, with 3 implementations each. Wow! And the
+complexity of those implementations vary a lot. And I guess Spring Data
+is there to show off how neat it is. Well, we will show how neat it
+could have been.
+
+Let's remove all the implementations, because we don't need that.
+
+They contain a bunch of ```find``` methods and some has a ```save```
+method as well. We will actually need to add a Mixin for each of
+these. But some doesn't make sense, as "saving a visit". Let's take one
+repository at a time.
+
+### VetRepository
+Finding all Vets and no other find methods. We use ManyAssociation
+inside a single Vets entity as the way to accomplish this.
+
+### OwnerRepository
+It can find by last name and by id. Let's implement the first with Query
+and the other is a straight lookup.
+
+It also has a ```saveOwner()``` method, which doesn't make sense. We
+need a factory instead. So, let's add an OwnerFactory.
+
+Then we add implementation of the two remaining methods in the
+```OwnerRepository```, and we are done with that.
+
+### PetRepository
+This is more or less the same work as with the OwnerRepository above.
+A new factory and implementations for findPetTypes and findById.
+
+### VisitRepository
+This is completely unnecessary. The visits of a given Pet is found
+inside the Pet. And the factory of the ```Visit``` could also be in the
+Pet class, where it kind of belong.
+

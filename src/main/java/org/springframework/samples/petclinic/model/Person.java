@@ -15,9 +15,11 @@
  */
 package org.springframework.samples.petclinic.model;
 
+import org.apache.zest.api.entity.Identity;
 import org.apache.zest.api.property.Property;
 
-public interface Person {
+public interface Person extends Identity
+{
 
     Property<String> firstName();
 

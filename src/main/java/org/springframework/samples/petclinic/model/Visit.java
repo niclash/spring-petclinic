@@ -16,13 +16,13 @@
 package org.springframework.samples.petclinic.model;
 
 import java.time.LocalDate;
+import org.apache.zest.api.entity.Identity;
 import org.apache.zest.api.property.Property;
 
-public interface Visit {
+public interface Visit extends Identity
+{
 
     Property<LocalDate> date();
 
     Property<String> description();
-
-    Property<Pet> pet();
 }

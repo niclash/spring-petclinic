@@ -17,18 +17,19 @@ package org.springframework.samples.petclinic.repository;
 
 import java.util.Collection;
 
+import org.apache.zest.api.injection.scope.Structure;
+import org.apache.zest.api.mixin.Mixins;
+import org.apache.zest.api.unitofwork.UnitOfWork;
+import org.apache.zest.api.unitofwork.UnitOfWorkFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Vet;
+import org.springframework.samples.petclinic.model.Vets;
 
 /**
  * Repository class for <code>Vet</code> domain objects All method names are compliant with Spring Data naming
  * conventions so this interface can easily be extended for Spring Data See here: http://static.springsource.org/spring-data/jpa/docs/current/reference/html/jpa.repositories.html#jpa.query-methods.query-creation
- *
- * @author Ken Krebs
- * @author Juergen Hoeller
- * @author Sam Brannen
- * @author Michael Isvy
  */
+@Mixins(VetRepository.Mixin.class)
 public interface VetRepository {
 
     /**
@@ -38,5 +39,19 @@ public interface VetRepository {
      */
     Collection<Vet> findAll() throws DataAccessException;
 
+    class Mixin
+        implements VetRepository
+    {
+        @Structure
+        private UnitOfWorkFactory uowf;
 
+        @Override
+        public Collection<Vet> findAll()
+            throws DataAccessException
+        {
+            UnitOfWork uow = uowf.currentUnitOfWork();
+            Vets vets = uow.get( Vets.class, "<all vets>" );
+            return vets.vets().toList();
+        }
+    }
 }
